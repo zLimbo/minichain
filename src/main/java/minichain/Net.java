@@ -6,7 +6,7 @@ public class Net {
 
     static final Set<PeerNode> peerNodes = new HashSet<>();
     static final Queue<Transaction> transactionPool = new LinkedList<>();
-    static int difficulty = 6;
+    static int difficulty = 4;
 
     static void registerPeerNode(PeerNode peerNode) {
         synchronized (peerNodes) {
