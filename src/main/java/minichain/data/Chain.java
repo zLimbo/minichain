@@ -1,4 +1,6 @@
-package minichain;
+package minichain.data;
+
+import minichain.utils.SHA256Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +11,7 @@ public class Chain {
 
     public Chain() {
         // 创世区块
-        Block genesisBlock = new Block(Util.sha256Digest("genesis"),
+        Block genesisBlock = new Block(SHA256Util.sha256Digest("genesis"),
                 "", 0, "", 0, new ArrayList<>());
         blockList.add(genesisBlock);
     }

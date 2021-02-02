@@ -1,6 +1,6 @@
-package minichain;
+package minichain.data;
 
-import java.util.UUID;
+import minichain.utils.SHA256Util;
 
 public class Transaction {
 
@@ -9,7 +9,7 @@ public class Transaction {
 
     public Transaction(String data) {
         this.data = data;
-        this.hash = Util.sha256Digest(data);
+        this.hash = SHA256Util.sha256Digest(data);
     }
 
     public String getData() {

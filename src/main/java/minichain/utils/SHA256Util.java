@@ -1,14 +1,14 @@
-package minichain;
+package minichain.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Util {
+public class SHA256Util {
 
-    static final public String HEX_CHAR = "0123456789abcdef";
+    private static final String HEX_CHAR = "0123456789abcdef";
 
-    static public String bytes2HexString(byte[] data) {
+    public static String bytes2HexString(byte[] data) {
         StringBuilder stringBuilder = new StringBuilder("0x");
         for (byte x: data) {
             int y = x & 0xff;
@@ -18,7 +18,7 @@ public class Util {
         return stringBuilder.toString();
     }
 
-    static public String sha256Digest(String data) {
+    public static String sha256Digest(String data) {
         MessageDigest sha256Digest = null;
         try {
             sha256Digest = MessageDigest.getInstance("SHA-256");

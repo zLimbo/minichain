@@ -1,4 +1,4 @@
-package minichain;
+package minichain.data;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Block {
 
-    static final int MAX_TX_SIZE = 100;
+    public static final int MAX_TX_SIZE = 100;
 
     private long index = -1;
     private String hash;

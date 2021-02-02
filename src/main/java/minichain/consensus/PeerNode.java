@@ -1,6 +1,11 @@
-package minichain;
+package minichain.consensus;
 
 import com.alibaba.fastjson.JSONObject;
+import minichain.utils.SHA256Util;
+import minichain.data.Block;
+import minichain.data.Chain;
+import minichain.data.Transaction;
+import minichain.network.Net;
 
 import java.util.List;
 import java.util.Random;
@@ -18,7 +23,7 @@ public class PeerNode extends Thread {
     public PeerNode() {
         // 默认节点名为线程名
         createTime = System.currentTimeMillis();
-        hash = Util.sha256Digest(getName() + createTime);
+        hash = SHA256Util.sha256Digest(getName() + createTime);
         Net.registerPeerNode(this);    // 注册节点到区块链”网络“中
     }
 
@@ -70,7 +75,7 @@ public class PeerNode extends Thread {
     public void mineBlock() {
         String parentHash = chain.latestBlock().getHash();
         long nonce = Math.abs(new Random().nextLong());
-        String blockHash = Util.sha256Digest(parentHash + nonce);
+        String blockHash = SHA256Util.sha256Digest(parentHash + nonce);
         if (blockHash.startsWith(Net.hashPrefixTarget())) {
             System.out.println(Thread.currentThread().getName() + ": " +
                     getName() + " mined a new Block! [nonce: " +
