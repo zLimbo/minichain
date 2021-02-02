@@ -1,11 +1,14 @@
 package minichain;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.List;
 
 public class Block {
 
     static final int MAX_TX_SIZE = 100;
 
+    private long index = -1;
     private String hash;
     private String parentHash;
     private int difficulty;
@@ -28,6 +31,14 @@ public class Block {
         this.transactions = transactions;
 
         this.timestamp = System.currentTimeMillis();
+    }
+
+    public long getIndex() {
+        return index;
+    }
+
+    public void setIndex(long index) {
+        this.index = index;
     }
 
     public String getHash() {
@@ -84,5 +95,9 @@ public class Block {
 
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
+    }
+
+    public JSONObject toJson() {
+        return (JSONObject) JSONObject.toJSON(this);
     }
 }

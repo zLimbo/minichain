@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Chain {
 
-    private List<Block> blockList = new ArrayList<>();
+    private final List<Block> blockList = new ArrayList<>();
 
     public Chain() {
         // 创世区块
@@ -15,13 +15,27 @@ public class Chain {
     }
 
     public Block latestBlock() {
-        return blockList.get(blockList.size() - 1);
+        synchronized (blockList) {
+            return blockList.get(blockList.size() - 1);
+        }
     }
 
     public void addBlock(Block block) {
-        blockList.add(block);
+        synchronized (blockList) {
+            block.setIndex(blockList.size());
+            blockList.add(block);
+        }
     }
 
+    public int getLength() {
+        synchronized (blockList) {
+            return blockList.size();
+        }
+    }
+
+    public List<Block> getBlockList() {
+        return blockList;
+    }
 
 //    public Block getBlock(int num) {
 //

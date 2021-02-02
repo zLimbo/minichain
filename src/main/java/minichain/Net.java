@@ -1,12 +1,14 @@
 package minichain;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.*;
 
 public class Net {
 
     static final Set<PeerNode> peerNodes = new HashSet<>();
     static final Queue<Transaction> transactionPool = new LinkedList<>();
-    static int difficulty = 4;
+    static int difficulty = 5;
 
     static void registerPeerNode(PeerNode peerNode) {
         synchronized (peerNodes) {
@@ -57,10 +59,25 @@ public class Net {
          }
     }
 
-    public Net(int peerNodeNum) {
+    static JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        for (PeerNode peerNode: peerNodes) {
+            json.put(peerNode.getName(), peerNode.toJson());
+        }
+        return json;
+    }
+
+    static public void simulate(int peerNodeNum) {
         for (int i = 0; i < peerNodeNum; ++i) {
             PeerNode peerNode = new PeerNode("Node" + i);
             peerNode.start();
         }
+        System.out.println(JSONObject.toJSONString(Net.toJson(), true));
+        while (true) ;
+    }
+
+    static public void simulate(int peerNodeNum, int difficulty) {
+        Net.difficulty = difficulty;
+        simulate(peerNodeNum);
     }
 }
