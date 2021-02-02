@@ -37,8 +37,8 @@ public class Chain {
         return blockList;
     }
 
-//    public Block getBlock(int num) {
-//
-//    }
+    public Block getBlock(int num) {
+        return blockList.get(num);
+    }
 
 }

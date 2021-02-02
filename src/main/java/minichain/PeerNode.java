@@ -45,7 +45,6 @@ public class PeerNode extends Thread {
         Net.addTransaction(transaction);
     }
 
-
     public boolean checkChain(Chain otherLongChain) {
 
         return true;
@@ -55,41 +54,36 @@ public class PeerNode extends Thread {
         chain.addBlock(otherLongChain.latestBlock());
     }
 
-
-    public boolean mineBlock() {
-
-        Random random = new Random();
-        long nonce = random.nextLong();
-        String parentHash = chain.latestBlock().getHash();
-
-        while (true) {
-            // 每次计算块哈希前检查是否有其他节点已经挖出块
-            synchronized (otherLongChainPeerNodeMutex) {
-                if (otherLongChainPeerNode != null) {
+    public void synchronize() {
+        synchronized (otherLongChainPeerNodeMutex) {
+            if (otherLongChainPeerNode != null) {
 //                    System.out.println(getName() + " " + otherLongChainPeerNode.getName());
-                    Chain otherLongChain = otherLongChainPeerNode.getChain();
-                    if (checkChain(otherLongChain)) {
-                        updateChain(otherLongChain);
-                    }
-                    otherLongChainPeerNode = null;
-                    return false;
+                Chain otherLongChain = otherLongChainPeerNode.getChain();
+                if (checkChain(otherLongChain)) {
+                    updateChain(otherLongChain);
                 }
+                otherLongChainPeerNode = null;
             }
+        }
+    }
 
-            nonce = random.nextLong();
-            String blockHash = Util.sha256Digest(parentHash + nonce);
-            if (blockHash.startsWith(Net.hashPrefixTarget())) {
-                System.out.println(Thread.currentThread().getName() + ": " +
-                        getName() + " mined a new Block! [nonce: " +
-                        nonce + ", blockHash: " + blockHash + ", parentHash: " +
-                        parentHash + "]");
-                List<Transaction> transactions = Net.getTransactions();
-                Block block = new Block(blockHash, parentHash, Net.getDifficulty(), hash, nonce, transactions);
-                chain.addBlock(block);
-                Net.boardcast(this);
-                System.out.println(JSONObject.toJSONString(Net.toJson(), true));
-                return true;
-            }
+    public void mineBlock() {
+        String parentHash = chain.latestBlock().getHash();
+        long nonce = Math.abs(new Random().nextLong());
+        String blockHash = Util.sha256Digest(parentHash + nonce);
+        if (blockHash.startsWith(Net.hashPrefixTarget())) {
+            System.out.println(Thread.currentThread().getName() + ": " +
+                    getName() + " mined a new Block! [nonce: " +
+                    nonce + ", blockHash: " + blockHash + ", parentHash: " +
+                    parentHash + "]");
+            List<Transaction> transactions = Net.getTransactions();
+            Block block = new Block(blockHash, parentHash, Net.getDifficulty(), hash, nonce, transactions);
+            chain.addBlock(block);
+            // 向其他节点广播
+            Net.boardcast(this);
+            // print json
+            System.out.println(JSONObject.toJSONString(Net.toJson(), true));
+            System.out.println("current node: " + getName() + "\nchain length: " + chain.getLength());
         }
 
     }
@@ -99,9 +93,17 @@ public class PeerNode extends Thread {
     public void run() {
 
         while (true) {
+            // 一定概率发送一笔交易
+            if (new Random().nextInt(Net.getSendProbability()) == 0) {
+                sendTransaction();
+            }
+            // 每次计算块哈希前检查是否有其他节点已经挖出块
+            synchronize();
+            // 一次挖矿尝试
             mineBlock();
         }
     }
+
 
     public String getHash() {
         return hash;

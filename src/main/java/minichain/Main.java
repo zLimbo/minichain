@@ -1,6 +1,6 @@
 package minichain;
 
-public class TestChain {
+public class Main {
 
     static public void main(String[] args) {
 

@@ -7,15 +7,24 @@ public class Transaction {
     String data;
     String hash;
 
-
     public Transaction(String data) {
         this.data = data;
         this.hash = Util.sha256Digest(data);
     }
 
+    public String getData() {
+        return data;
+    }
 
-    static public Transaction randomTransaction() {
-        String data = UUID.randomUUID().toString();
-        return new Transaction(data);
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 }

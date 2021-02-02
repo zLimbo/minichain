@@ -29,7 +29,6 @@ public class Block {
         this.miner = miner;
         this.nonce = nonce;
         this.transactions = transactions;
-
         this.timestamp = System.currentTimeMillis();
     }
 

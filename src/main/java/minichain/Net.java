@@ -9,6 +9,7 @@ public class Net {
     static final Set<PeerNode> peerNodes = new HashSet<>();
     static final Queue<Transaction> transactionPool = new LinkedList<>();
     static int difficulty = 5;
+    static int sendProbability = 1000000;
 
     static void registerPeerNode(PeerNode peerNode) {
         synchronized (peerNodes) {
@@ -26,7 +27,7 @@ public class Net {
 
     static List<Transaction> getTransactions() {
         List<Transaction> transactions = new ArrayList<>();
-        while (true) {
+        while (transactions.size() < Block.MAX_TX_SIZE) {
             synchronized (transactionPool) {
                 if (transactionPool.isEmpty()) {
                     break;
@@ -39,6 +40,12 @@ public class Net {
 
     static int getDifficulty() {
         return difficulty;
+    }
+
+    static int getSendProbability() {
+        synchronized (peerNodes) {
+            return sendProbability * peerNodes.size();
+        }
     }
 
     static String hashPrefixTarget() {

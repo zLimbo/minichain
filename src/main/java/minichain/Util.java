@@ -8,7 +8,6 @@ public class Util {
 
     static final public String HEX_CHAR = "0123456789abcdef";
 
-
     static public String bytes2HexString(byte[] data) {
         StringBuilder stringBuilder = new StringBuilder("0x");
         for (byte x: data) {
@@ -18,7 +17,6 @@ public class Util {
         }
         return stringBuilder.toString();
     }
-
 
     static public String sha256Digest(String data) {
         MessageDigest sha256Digest = null;
@@ -31,6 +29,5 @@ public class Util {
         sha256Digest.update(data.getBytes(StandardCharsets.UTF_8));
         return bytes2HexString(sha256Digest.digest());
     }
-
 
 }
