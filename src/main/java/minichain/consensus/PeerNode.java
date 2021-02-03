@@ -14,8 +14,6 @@ public class PeerNode extends Thread {
     private final String hash;
     private final long createTime;
     private long money = 0;
-//    private PeerNode otherLongChainPeerNode = null;
-//    final private Object otherLongChainPeerNodeMutex = new Object();
     private final Chain chain = new Chain();;
     private final Map<String, Block> newBlocks = new HashMap<>();
 
@@ -42,7 +40,6 @@ public class PeerNode extends Thread {
     }
 
     public void sendTransaction() {
-//        Transaction transaction = Transaction.randomTransaction();
         Transaction transaction = new Transaction(getName() + " - " + UUID.randomUUID());
         Net.addTransaction(transaction);
     }
@@ -86,13 +83,15 @@ public class PeerNode extends Thread {
             // 向其他节点广播
             Net.boardcast(this, newBlock);
             mineReward();
+
             // print log
+            System.out.println("mined a block!");
+            System.out.println(JSONObject.toJSONString(Net.toJson(), true));
             System.out.println(Thread.currentThread().getName() + ": " +
                     getName() + " mined a new Block! [nonce: " +
                     nonce + ", blockHash: " + blockHash + ", parentHash: " +
                     parentHash + "]");
-            System.out.println(JSONObject.toJSONString(Net.toJson(), true));
-            System.out.println("current node: " + getName() + "\nchain length: " + chain.getLength());
+            System.out.println("current node: " + getName() + " chain length: " + chain.getLength());
             System.out.println("all peer node chain length: " + Net.getAllPeerNodeChainLength());
         }
 

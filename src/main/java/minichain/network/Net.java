@@ -45,12 +45,14 @@ public class Net {
     public static List<Transaction> getTransactions() {
         List<Transaction> transactions = new ArrayList<>();
         while (transactions.size() < Block.MAX_TX_SIZE) {
+            Transaction transaction = null;
             synchronized (transactionPool) {
                 if (transactionPool.isEmpty()) {
                     break;
                 }
-                transactions.add(transactionPool.remove());
+                transaction = transactionPool.remove();
             }
+            transactions.add(transaction);
         }
         return transactions;
     }
@@ -60,9 +62,11 @@ public class Net {
     }
 
     public static int getSendProbability() {
+        int peerNodeNum = 0;
         synchronized (peerNodes) {
-            return sendProbability * peerNodes.size();
+            peerNodeNum = peerNodes.size();
         }
+        return sendProbability * peerNodeNum;
     }
 
     public static String hashPrefixTarget() {
