@@ -4,8 +4,8 @@ import minichain.utils.SHA256Util;
 
 public class Transaction {
 
-    String data;
-    String hash;
+    private final String data;
+    private final String hash;
 
     public Transaction(String data) {
         this.data = data;
@@ -16,15 +16,7 @@ public class Transaction {
         return data;
     }
 
-    public void setData(String data) {
-        this.data = data;
-    }
-
     public String getHash() {
         return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
     }
 }

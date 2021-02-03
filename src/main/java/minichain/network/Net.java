@@ -12,7 +12,7 @@ public class Net {
     public static final Set<PeerNode> peerNodes = new HashSet<>();
     public static final Queue<Transaction> transactionPool = new LinkedList<>();
     public static int difficulty = 5;
-    public static int sendProbability = 1000000;
+    public static int sendProbability = 100000;
 
     public static void registerPeerNode(PeerNode peerNode) {
         synchronized (peerNodes) {
@@ -96,8 +96,10 @@ public class Net {
 
     public static JSONObject toJson() {
         JSONObject json = new JSONObject();
-        for (PeerNode peerNode: peerNodes) {
-            json.put(peerNode.getName(), peerNode.toJson());
+        synchronized (peerNodes) {
+            for (PeerNode peerNode : peerNodes) {
+                json.put(peerNode.getName(), peerNode.toJson());
+            }
         }
         return json;
     }
