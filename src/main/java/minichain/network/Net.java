@@ -21,6 +21,20 @@ public class Net {
         }
     }
 
+    public static void simulate(int peerNodeNum) {
+        for (int i = 0; i < peerNodeNum; ++i) {
+            PeerNode peerNode = new PeerNode("Node" + i);
+            peerNode.start();
+        }
+        System.out.println(JSONObject.toJSONString(Net.toJson(), true));
+        while (true) ;
+    }
+
+    public static void simulate(int peerNodeNum, int difficulty) {
+        Net.difficulty = difficulty;
+        simulate(peerNodeNum);
+    }
+
     public static void addTransaction(Transaction transaction) {
 
         synchronized (transactionPool) {
@@ -59,14 +73,25 @@ public class Net {
         return stringBuilder.toString();
     }
 
-    public static void boardcast(PeerNode fromPeerNode) {
+    public static void boardcast(PeerNode fromPeerNode, Block newBlock) {
          synchronized (peerNodes) {
              for (PeerNode toPeerNode: peerNodes) {
                  if (toPeerNode != fromPeerNode) {
-                     toPeerNode.setOtherLongChainPeerNode(fromPeerNode);
+                     toPeerNode.acceptNewBlock(newBlock);
                  }
              }
          }
+    }
+
+    public static List<Integer> getAllPeerNodeChainLength() {
+        List<Integer> lengthList = new ArrayList<>();
+
+        synchronized (peerNodes) {
+            for (PeerNode peerNode : peerNodes) {
+                lengthList.add(peerNode.getChain().getLength());
+            }
+        }
+        return lengthList;
     }
 
     public static JSONObject toJson() {
@@ -75,19 +100,5 @@ public class Net {
             json.put(peerNode.getName(), peerNode.toJson());
         }
         return json;
-    }
-
-    public static void simulate(int peerNodeNum) {
-        for (int i = 0; i < peerNodeNum; ++i) {
-            PeerNode peerNode = new PeerNode("Node" + i);
-            peerNode.start();
-        }
-        System.out.println(JSONObject.toJSONString(Net.toJson(), true));
-        while (true) ;
-    }
-
-    public static void simulate(int peerNodeNum, int difficulty) {
-        Net.difficulty = difficulty;
-        simulate(peerNodeNum);
     }
 }

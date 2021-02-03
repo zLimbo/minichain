@@ -7,18 +7,17 @@ import minichain.data.Chain;
 import minichain.data.Transaction;
 import minichain.network.Net;
 
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class PeerNode extends Thread {
 
     private String hash;
     private long createTime;
     private long money = 0;
-    private PeerNode otherLongChainPeerNode = null;
-    final private Object otherLongChainPeerNodeMutex = new Object();
-    private Chain chain;
+//    private PeerNode otherLongChainPeerNode = null;
+//    final private Object otherLongChainPeerNodeMutex = new Object();
+    private final Chain chain = new Chain();;
+    private final Map<String, Block> newBlocks = new HashMap<>();
 
     public PeerNode() {
         // 默认节点名为线程名
@@ -30,17 +29,15 @@ public class PeerNode extends Thread {
     public PeerNode(String name) {
         this();
         this.setName(name);
-
-        chain = new Chain();
     }
 
     public Chain getChain() {
         return chain;
     }
 
-    public void setOtherLongChainPeerNode(PeerNode otherLongChainPeerNode) {
-        synchronized (otherLongChainPeerNodeMutex) {
-            this.otherLongChainPeerNode = otherLongChainPeerNode;
+    public void acceptNewBlock(Block block) {
+        synchronized (newBlocks) {
+            newBlocks.put(block.getParentHash(), block);
         }
     }
 
@@ -50,24 +47,23 @@ public class PeerNode extends Thread {
         Net.addTransaction(transaction);
     }
 
-    public boolean checkChain(Chain otherLongChain) {
-
+    public boolean checkChain(Block block) {
+        // todo
         return true;
     }
 
-    public void updateChain(Chain otherLongChain) {
-        chain.addBlock(otherLongChain.latestBlock());
-    }
+    public void synchronizeChain() {
 
-    public void synchronize() {
-        synchronized (otherLongChainPeerNodeMutex) {
-            if (otherLongChainPeerNode != null) {
-//                    System.out.println(getName() + " " + otherLongChainPeerNode.getName());
-                Chain otherLongChain = otherLongChainPeerNode.getChain();
-                if (checkChain(otherLongChain)) {
-                    updateChain(otherLongChain);
-                }
-                otherLongChainPeerNode = null;
+        while (true) {
+            Block block;
+            synchronized (newBlocks) {
+                block = newBlocks.remove(chain.latestBlock().getHash());
+            }
+            if (block == null) {
+                break;
+            }
+            if (checkChain(block)) {
+                chain.addBlock(block);
             }
         }
     }
@@ -82,13 +78,14 @@ public class PeerNode extends Thread {
                     nonce + ", blockHash: " + blockHash + ", parentHash: " +
                     parentHash + "]");
             List<Transaction> transactions = Net.getTransactions();
-            Block block = new Block(blockHash, parentHash, Net.getDifficulty(), hash, nonce, transactions);
-            chain.addBlock(block);
+            Block newBlock = new Block(blockHash, parentHash, Net.getDifficulty(), hash, nonce, transactions);
+            chain.addBlock(newBlock);
             // 向其他节点广播
-            Net.boardcast(this);
+            Net.boardcast(this, newBlock);
             // print json
-            System.out.println(JSONObject.toJSONString(Net.toJson(), true));
+//            System.out.println(JSONObject.toJSONString(Net.toJson(), true));
             System.out.println("current node: " + getName() + "\nchain length: " + chain.getLength());
+            System.out.println("all peer node chain length: " + Net.getAllPeerNodeChainLength());
         }
 
     }
@@ -103,12 +100,11 @@ public class PeerNode extends Thread {
                 sendTransaction();
             }
             // 每次计算块哈希前检查是否有其他节点已经挖出块
-            synchronize();
+            synchronizeChain();
             // 一次挖矿尝试
             mineBlock();
         }
     }
-
 
     public String getHash() {
         return hash;
@@ -122,21 +118,12 @@ public class PeerNode extends Thread {
         return money;
     }
 
-    public PeerNode getOtherLongChainPeerNode() {
-        return otherLongChainPeerNode;
-    }
-
-    public Object getOtherLongChainPeerNodeMutex() {
-        return otherLongChainPeerNodeMutex;
-    }
-
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
         json.put("hash", hash);
         json.put("createTime", createTime);
         json.put("money", money);
-        json.put("otherLongChainPeerNode",
-                otherLongChainPeerNode == null ? null : otherLongChainPeerNode.getName());
+        json.put("new block num", newBlocks.size());
         json.put("chain", JSONObject.toJSON(chain));
         return json;
     }
