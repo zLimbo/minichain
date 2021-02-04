@@ -85,8 +85,8 @@ public class PeerNode extends Thread {
             mineReward();
 
             // print log
-            System.out.println("mined a block!");
-            System.out.println(JSONObject.toJSONString(Net.toJson(), true));
+//            System.out.println("mined a block!");
+//            System.out.println(JSONObject.toJSONString(Net.toJson(), true));
             System.out.println(Thread.currentThread().getName() + ": " +
                     getName() + " mined a new Block! [nonce: " +
                     nonce + ", blockHash: " + blockHash + ", parentHash: " +

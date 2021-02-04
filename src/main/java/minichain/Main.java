@@ -5,6 +5,6 @@ import minichain.network.Net;
 public class Main {
 
     static public void main(String[] args) {
-        Net.simulate(10, 5);
+        Net.simulate(20, 5);
     }
 }
