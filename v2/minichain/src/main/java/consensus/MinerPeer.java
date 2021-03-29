@@ -119,10 +119,13 @@ public class MinerPeer extends Thread {
         // list大小为1时停止迭代
         while (list.size() != 1) {
             List<String> newList = new ArrayList<>();
+            // 如果出现奇数个节点，即最后一个节点没有右结点与其构成一对，就将当前节点复制一份作为右节点
+            if ((list.size() & 1) == 1) {
+                list.add(list.get(list.size() - 1));
+            }
             for (int i = 0; i < list.size(); i += 2) {
                 String leftHash = list.get(i);
-                // 如果出现奇数个节点，即最后一个节点没有右结点与其构成一对，就将当前节点复制一份作为右节点
-                String rightHash = (i + 1 < list.size() ? list.get(i + 1) : leftHash);
+                String rightHash = list.get(i + 1);
                 String parentHash = SecurityUtil.sha256Digest(leftHash + rightHash);
                 newList.add(parentHash);
             }
@@ -237,10 +240,13 @@ public class MinerPeer extends Thread {
         // list大小为1时停止迭代
         while (list.size() != 1) {
             List<String> newList = new ArrayList<>();
+            // 如果出现奇数个节点，即最后一个节点没有右结点与其构成一对，就将当前节点复制一份作为右节点
+            if ((list.size() & 1) == 1) {
+                list.add(list.get(list.size() - 1));
+            }
             for (int i = 0; i < list.size(); i += 2) {
                 String leftHash = list.get(i);
-                // 如果出现奇数个节点，即最后一个节点没有右结点与其构成一对，就将当前节点复制一份作为右节点
-                String rightHash = (i + 1 < list.size() ? list.get(i + 1) : leftHash);
+                String rightHash = list.get(i + 1);
                 String parentHash = SecurityUtil.sha256Digest(leftHash + rightHash);
                 newList.add(parentHash);
 
